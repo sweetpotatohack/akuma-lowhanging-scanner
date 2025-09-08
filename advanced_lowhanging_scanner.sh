@@ -36,10 +36,8 @@ declare -gr WHITE='\033[1;37m'
 declare -gr NC='\033[0m' # No Color
 declare -gr BOLD='\033[1m'
 
-# Массивы подсетей (по умолчанию только тестовая)
-DEFAULT_SUBNETS=(
-    "192.168.112.0/22"
-)
+# Массивы подсетей (по умолчанию пустой - пользователь должен указать)
+DEFAULT_SUBNETS=()
 
 # Массивы модулей по критичности
 declare -a CRITICAL_MODULES=(
@@ -166,6 +164,16 @@ load_configuration() {
         log "WARN" "Configuration file not found, using defaults"
         create_default_config
     fi
+    
+    # Validate that subnets are configured
+    if [[ ${#SUBNETS[@]} -eq 0 ]]; then
+        log "ERROR" "No subnets configured! Please edit $CONFIG_FILE or use command line options."
+        echo -e "${RED}ERROR:${NC} No target subnets specified!"
+        echo "Please either:"
+        echo "1. Edit the configuration file: $CONFIG_FILE"
+        echo "2. Use command line: $0 --subnet 192.168.1.0/24"
+        exit 1
+    fi
 }
 
 create_default_config() {
@@ -173,9 +181,11 @@ create_default_config() {
 # AKUMA's Advanced Scanner Configuration
 # Modify these settings according to your needs
 
-# Subnets to scan (space-separated)
+# Subnets to scan (space-separated) - REPLACE WITH YOUR TARGET NETWORKS!
 SUBNETS=(
-    "192.168.112.0/22"
+    # "192.168.1.0/24"    # Example: Internal network
+    # "10.0.0.0/16"       # Example: Corporate network
+    # "172.16.0.0/12"     # Example: Private network
 )
 
 # Parallel execution settings
@@ -183,16 +193,17 @@ MAX_PARALLEL=20
 TIMEOUT_PER_HOST=300
 NMAP_THREADS=100
 
-# Authentication settings
+# Authentication settings (CHANGE THESE!)
 AUTHENTICATED_SCAN=false
-USERNAME="pentest"
-PASSWORD="43CdfGjkCgbCjw"
+USERNAME=""
+PASSWORD=""
 DOMAIN=""
 
 # Debug mode
 DEBUG_MODE=false
 EOF
     log "INFO" "Created default configuration file: $CONFIG_FILE"
+    log "WARN" "Please edit $CONFIG_FILE to configure target subnets!"
 }
 
 # ========================================================================
@@ -484,7 +495,11 @@ run_authenticated_scan() {
     fi
     
     log "INFO" "Starting authenticated vulnerability scan"
-    log "INFO" "Using credentials: $USERNAME@$DOMAIN"
+    if [[ -n "$DOMAIN" ]]; then
+        log "INFO" "Using credentials: $USERNAME@$DOMAIN"
+    else
+        log "INFO" "Using credentials: $USERNAME (no domain)"
+    fi
     
     # Проверяем credentials
     test_credentials || return 1
@@ -802,6 +817,10 @@ while [[ $# -gt 0 ]]; do
             CONFIG_FILE="$2"
             shift 2
             ;;
+        --subnet)
+            SUBNETS+=("$2")
+            shift 2
+            ;;
         --help|-h)
             echo "AKUMA's Advanced Low-Hanging Fruit Scanner"
             echo ""
@@ -812,12 +831,18 @@ while [[ $# -gt 0 ]]; do
             echo "  --username USER     Username for authentication"
             echo "  --password PASS     Password for authentication"
             echo "  --domain DOMAIN     Domain for authentication"
+            echo "  --subnet SUBNET     Target subnet (can be used multiple times)"
             echo "  --debug             Enable debug mode"
             echo "  --config FILE       Use custom config file"
             echo "  --help, -h          Show this help"
             echo ""
-            echo "Example:"
-            echo "  $0 --auth --username pentest --password 'MyP@ssw0rd' --domain CORP"
+            echo "Examples:"
+            echo "  # Basic scan with subnet"
+            echo "  $0 --subnet 192.168.1.0/24"
+            echo ""
+            echo "  # Authenticated scan with multiple subnets"
+            echo "  $0 --auth --username admin --password 'P@ssw0rd' --domain CORP \\"
+            echo "     --subnet 192.168.1.0/24 --subnet 10.0.0.0/16"
             exit 0
             ;;
         *)

@@ -13,13 +13,14 @@ NC='\033[0m'
 echo -e "${RED}🔥 TESTING SCANNER IMPROVEMENTS 🔥${NC}"
 echo ""
 
-# Тестируем конкретные хосты с известными результатами
-TEST_HOSTS=(
-    "192.168.112.156"  # SMBGhost vulnerable  
-    "192.168.112.197"  # SMBGhost vulnerable
-    "192.168.112.237"  # SMBGhost vulnerable
-    "192.168.112.59"   # Not vulnerable
-)
+# Тестируем конкретные хосты (пользователь должен указать)
+if [[ $# -eq 0 ]]; then
+    echo -e "${RED}Usage: $0 <host1> [host2] [host3] ...${NC}"
+    echo "Example: $0 192.168.1.10 192.168.1.20 10.0.0.5"
+    exit 1
+fi
+
+TEST_HOSTS=("$@")
 
 RESULTS_DIR="/tmp/improvement_test_$(date +%H%M%S)"
 mkdir -p "$RESULTS_DIR"
@@ -89,12 +90,17 @@ read -r response
 if [[ $response =~ ^[Yy]$ ]]; then
     echo "Running improved scanner on test subset..."
     
-    # Создаём тестовый конфиг
+    # Создаём тестовый конфиг для первых трёх хостов
     cat > "$RESULTS_DIR/test_config.conf" << EOF
 SUBNETS=(
-    "192.168.112.156/32"
-    "192.168.112.197/32"
-    "192.168.112.237/32"
+EOF
+    # Добавляем первые 3 хоста в /32 масках
+    for i in {0..2}; do
+        if [[ -n "${TEST_HOSTS[i]}" ]]; then
+            echo "    \"${TEST_HOSTS[i]}/32\"" >> "$RESULTS_DIR/test_config.conf"
+        fi
+    done
+    cat >> "$RESULTS_DIR/test_config.conf" << EOF
 )
 MAX_PARALLEL=5
 TIMEOUT_PER_HOST=60

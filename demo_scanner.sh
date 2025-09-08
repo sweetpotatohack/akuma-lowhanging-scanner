@@ -14,15 +14,25 @@ CYAN='\033[0;36m'
 NC='\033[0m'
 
 echo -e "${RED}🔥 AKUMA'S DEMO SCANNER 🔥${NC}"
-echo "Testing subnet: 192.168.112.0/22"
+echo "Usage: $0 <subnet>"
+echo "Example: $0 192.168.1.0/24"
 echo ""
+
+if [[ $# -eq 0 ]]; then
+    echo -e "${RED}ERROR: Please provide a subnet to scan${NC}"
+    echo "Example: $0 192.168.1.0/24"
+    exit 1
+fi
+
+TARGET_SUBNET="$1"
+echo "Testing subnet: $TARGET_SUBNET"
 
 # Создаём временную директорию
 DEMO_DIR="/tmp/akuma_demo_$(date +%H%M%S)"
 mkdir -p "$DEMO_DIR"
 
 echo -e "${CYAN}[1/4]${NC} Discovering live hosts..."
-nmap -sn --min-rate 1000 192.168.112.0/22 | grep "Nmap scan report" | awk '{print $5}' > "$DEMO_DIR/live_hosts.txt"
+nmap -sn --min-rate 1000 "$TARGET_SUBNET" | grep "Nmap scan report" | awk '{print $5}' > "$DEMO_DIR/live_hosts.txt"
 live_count=$(wc -l < "$DEMO_DIR/live_hosts.txt")
 echo -e "${GREEN}Found $live_count live hosts${NC}"
 
