@@ -5,7 +5,7 @@
 DATE: September 9, 2025
 TARGET: 192.168.112.0/22 (1024 IP addresses)  
 DURATION: ~25 minutes
-CREDENTIALS: ideco:hjl100ghb200cyf
+CREDENTIALS: lolkekss:lolkek
 
 ===============================================================================
                            💀 CRITICAL FINDINGS 💀
@@ -59,8 +59,8 @@ BUSINESS IMPACT: ██████████ 10/10 (CRITICAL)
 
 🔥 EMERGENCY RESPONSE (Execute within 1 hour):
 
-1. DISABLE USER ACCOUNT 'ideco' IMMEDIATELY
-   - Disable in Active Directory: astralnalog.ru\ideco
+1. DISABLE USER ACCOUNT 'lolkekss' IMMEDIATELY
+   - Disable in Active Directory: astralnalog.ru\lolkekss
    - Force logout from all sessions
    - Reset password with 20+ character complexity
 
