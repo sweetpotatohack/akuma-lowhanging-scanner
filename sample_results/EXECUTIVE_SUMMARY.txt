@@ -5,7 +5,7 @@
 DATE: September 9, 2025
 TARGET: 192.168.112.0/22 (1024 IP addresses)  
 DURATION: ~25 minutes
-CREDENTIALS: ideco:hjl100ghb200cyf
+CREDENTIALS: ideco:lolkek
 
 ===============================================================================
                            💀 CRITICAL FINDINGS 💀
