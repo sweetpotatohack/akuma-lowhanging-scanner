@@ -177,7 +177,7 @@ ultimate_scan_results/scan_YYYYMMDD_HHMMSS/
 ./ultimate_akuma_scanner.sh \
   --auth \
   --username "ideco" \
-  --password "hjl100ghb200cyf" \
+  --password "hjl100gфывфывфыап" \
   --subnet 192.168.112.0/22 \
   --debug
 ```
